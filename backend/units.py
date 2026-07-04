@@ -5,9 +5,9 @@ class Period:
 
 class Unit:
 
-    def __init__(self, power, periods_from_last_maintenance, idx):
+    def __init__(self, power, idx):
         self.power = power
-        self.periods_from_last_maintenance = periods_from_last_maintenance
+        self.periods_from_last_maintenance = 0
         self.idx = idx
 
         self.available = True
@@ -23,11 +23,8 @@ class Unit:
             self.available = True
         self.periods_from_last_maintenance += 1
 
-    def maintenance_cost_1(self):
-        return self.cf_1[self.periods_from_last_maintenance]
-
-    def maintenance_cost_2(self):
-        return self.cf_2[self.periods_from_last_maintenance]
+    def maintenance_cost(self, cf):
+        return cf[self.periods_from_last_maintenance]
 
     def is_maintenance_needed(self):
         return not self.available
@@ -37,6 +34,10 @@ class Unit:
             self.available = False
         self.periods_from_last_maintenance = 0
 
+
 class Schedule:
     def __init__(self):
         self.schedule = []
+
+    def append_unit(self, unit):
+        self.schedule.append(unit.idx)

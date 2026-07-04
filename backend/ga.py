@@ -4,9 +4,10 @@ class Individual:
     """
     Individual -- a single schedule
     """
-    def __init__(self):
-        self.schedule = []
-        self.fitness = 0.0
+    def __init__(self, schedule):
+        self.schedule = schedule
+        self.fitness_cost = 0.0
+        self.fitness_reliability = 0.0
 
     def initialize_schedule(self, T, t, K):
         """
@@ -18,15 +19,38 @@ class Individual:
         tmp = []
         self.schedule = tmp
 
-    def calculate_fitness(self):
+    def calculate_fitness_cost(self, operation_coeff, cf):
         """
-        Recalculates fitness of individual. Based on the cost of the schedule and/or nett reserve.
-        Basically for each t, gets costs and generation based on the unit order.
-        Penalty?
-        Maybe use weights as in the article.
+        Recalculates fitness of individual. Cost function.
         """
-        tmp = 1.0
-        self.fitness = tmp
+        T = len(self.schedule)
+        K = max(self.schedule)
+        for k in range(K):  # for each unit analyze the schedules for calcs
+            periods_worked = 0
+            last_maintenance_period = 0
+            for t in range(T):
+                k_main = self.schedule[t]       # unit maintained in t
+                if k_main == k:                 # if there is maintenance add the working costs and reset, add main cost and remember when it was
+                    self.fitness_cost += operation_coeff * periods_worked + cf[t - last_maintenance_period]
+                    periods_worked = 0
+                    last_maintenance_period = t
+                else:   # if there is no maintenance of k, just keep working
+                    periods_worked += 1
+            self.fitness_cost += operation_coeff * periods_worked   # if there is some unadded work in the end - add it now
+
+    def calculate_fitness_reliability(self, units, demands, t_coeff):
+
+        T = len(self.schedule)
+        K = max(self.schedule)
+        for t in range(T):
+            k_main = self.schedule[t]   # for each t check which k was maintained
+            power_generated = 0
+            for k in range(K):          # all units except this one worked - sum it's power
+                if k != k_main:
+                    power_generated += units[k].power * t_coeff
+            self.fitness_reliability += power_generated - demands[t]        # check if the demand was exceeded for the t
+
+
 
 class Population:
     """
@@ -34,25 +58,25 @@ class Population:
     """
 
     def __init__(self):
-        self.schedules = []
+        self.individuals = []
 
-    def initialize_schedules(self, size, T, t_num, K):
+    def initialize_population(self, size, schedules, operation_coeff, cf, units, demands, t_coeff):
         """
         Creates size of random individuals (schedules)
         """
         for i in range(size):
-            schedule = Individual()
-            schedule.initialize_schedule(T, t_num, K)
-            schedule.calculate_fitness()
-            self.schedules.append(schedule)
+            schedule = Individual(schedules[i])
+            schedule.calculate_fitness_cost(operation_coeff, cf)
+            schedule.calculate_fitness_reliability(units, demands, t_coeff)
+            self.individuals.append(schedule)
 
 
 class GeneticAlgorithm:
 
-    def __init__(self, population_size, T, t_num, K, generations):
+    def __init__(self, population_size, generations, schedules, operation_coeff, cf, units, demands, t_coeff):
 
         self.population = Population()
-        self.population.initialize_schedules(population_size, T, t_num, K)
+        self.population.initialize_population(population_size, schedules, operation_coeff, cf, units, demands, t_coeff)
         self.next_population = []
 
         self.generations = generations
