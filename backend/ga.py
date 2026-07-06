@@ -1,4 +1,5 @@
 from units import Unit, Schedule
+from collections import Counter
 import random
 
 class Individual:
@@ -71,6 +72,7 @@ class GeneticAlgorithm:
         self.generations = generations
         self.population_size = population_size
         self.selection_rate = selection_rate
+        self.units = units
 
         self.best = None
 
@@ -121,14 +123,38 @@ class GeneticAlgorithm:
     def crossover(self):
         pass
 
-    def repair(self):
+    def repair(self, individual):
         """
         Repairs new individuals after crossover.
         1. Finds unit indices missing from the schedule.
-        2. Replaces random empty period with the maintenance of the missing unit.
+        2. Finds free maintenance slots.
+        3. If there are not enough slots, a random unit which is maintained > 1 times may free its slot.
+        4. Replaces random available slot with the maintenance of the missing unit.
         :return:
         """
-        pass
+        counts = Counter(individual.schedule)
+        missing_units = [u.idx for u in self.units if counts[u.idx] == 0]
+        free_periods = [t for t, u in enumerate(individual.schedule) if u == 0]
+
+        if len(missing_units) > len(free_periods):
+            seen = Counter()
+            duplicates = []
+            for t, u in enumerate(individual.schedule):
+                if u != 0:
+                    seen[u] += 1
+                if seen[u] > 1:
+                    duplicates.append(t)
+
+            free_periods += list(set(duplicates))
+
+        random.shuffle(missing_units)
+        random.shuffle(free_periods)
+
+        for (u, t) in zip(missing_units, free_periods):
+            individual.schedule[t] = u
+
+        return individual
+
 
     def mutate(self):
         pass
