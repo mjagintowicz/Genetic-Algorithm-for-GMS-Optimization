@@ -64,7 +64,7 @@ class Population:
 
 class GeneticAlgorithm:
 
-    def __init__(self, population_size, units, n_periods, operation_coef, cf, demands, criterion, generations, selection_rate=0.6):
+    def __init__(self, population_size, units, n_periods, operation_coef, cf, demands, criterion, generations, selection_rate=0.6, crossover_op="1_POINT"):
 
         self.population = Population(population_size, units, n_periods, operation_coef, cf, demands, criterion)
         self.next_population = []
@@ -73,6 +73,12 @@ class GeneticAlgorithm:
         self.population_size = population_size
         self.selection_rate = selection_rate
         self.units = units
+        self.n_periods = n_periods
+        self.operation_coef = operation_coef
+        self.cf = cf
+        self.demands = demands
+        self.criterion = criterion
+        self.crossover_op = crossover_op
 
         self.best = None
 
@@ -112,16 +118,19 @@ class GeneticAlgorithm:
 
     def selection(self, mode):
 
-        # Assume that all are picked for selection
-
-        if mode == "roulette":          # Dispatch the selected mode
+        if mode == "roulette":
             return self.selection_roulette()
         else:
             return self.selection_tournament()
 
 
-    def crossover(self):
-        pass
+    def adjust_fitness(self, individual):
+
+        if self.criterion == "Cost":
+            individual.calculate_fitness_cost(self.operation_coef, self.cf)
+        else:
+            individual.calculate_fitness_reliability(self.units, self.demands)
+
 
     def repair(self, individual):
         """
@@ -130,7 +139,7 @@ class GeneticAlgorithm:
         2. Finds free maintenance slots.
         3. If there are not enough slots, a random unit which is maintained > 1 times may free its slot.
         4. Replaces random available slot with the maintenance of the missing unit.
-        :return:
+        5. Recalculates fitness.
         """
         counts = Counter(individual.schedule)
         missing_units = [u.idx for u in self.units if counts[u.idx] == 0]
@@ -153,7 +162,70 @@ class GeneticAlgorithm:
         for (u, t) in zip(missing_units, free_periods):
             individual.schedule[t] = u
 
-        return individual
+        self.adjust_fitness(individual)
+
+
+    def crossover_1_point(self, parent1, parent2):
+
+        cross_point = random.randint(0, self.n_periods - 1)
+        new_schedule_1 = parent1.schedule[:cross_point] + parent2.schedule[cross_point:]
+        new_schedule_2 = parent2.schedule[:cross_point] + parent1.schedule[cross_point:]
+
+        return new_schedule_1, new_schedule_2
+
+
+    def crossover_2_point(self, parent1, parent2):
+
+        cross_point_1 = random.randint(0, self.n_periods - 1)
+        cross_point_2 = cross_point_1
+
+        while cross_point_1 == cross_point_2:
+            cross_point_2 = random.randint(0, self.n_periods - 1)
+
+        new_schedule_1 = parent1.schedule[:cross_point_1] + parent2.schedule[cross_point_1:cross_point_2] + parent1.schedule[cross_point_2:]
+        new_schedule_2 = parent2.schedule[:cross_point_1] + parent1.schedule[cross_point_1:cross_point_2] + parent2.schedule[cross_point_2:]
+
+        return new_schedule_1, new_schedule_2
+
+
+    def crossover_uniform(self, parent_1, parent_2):
+
+        new_schedule_1 = []
+        new_schedule_2 = []
+
+        for t in range(self.n_periods):
+            rng = random.uniform(0, 1)
+            if rng < 0.5:
+                new_schedule_1.append(parent_1.schedule[t])
+                new_schedule_2.append(parent_2.schedule[t])
+            else:
+                new_schedule_1.append(parent_2.schedule[t])
+                new_schedule_2.append(parent_1.schedule[t])
+
+        return new_schedule_1, new_schedule_2
+
+
+    def crossover(self, parent_1, parent_2):
+        """
+        The main crossover function.
+        1. Creates new schedules using the picked operator.
+        2. Turns the schedules into the individuals.
+        3. Repairs.
+        """
+        if self.crossover_op == "1_POINT":
+            new_schedule_1, new_schedule_2 = self.crossover_1_point(parent_1, parent_2)
+        elif self.crossover_op == "2_POINT":
+            new_schedule_1, new_schedule_2 = self.crossover_2_point(parent_1, parent_2)
+        else:
+            new_schedule_1, new_schedule_2 = self.crossover_uniform(parent_1, parent_2)
+
+        individual_1 = Individual(new_schedule_1)
+        individual_2 = Individual(new_schedule_2)
+
+        self.repair(individual_1)
+        self.repair(individual_2)
+
+        return individual_1, individual_2
 
 
     def mutate(self):

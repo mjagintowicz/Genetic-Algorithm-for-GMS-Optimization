@@ -2,7 +2,7 @@ from backend.ga import GeneticAlgorithm, Individual
 from debug_db import units, population_size, n_periods, operation_coef, cf, demands, criterion, generations, selection_rate
 import unittest
 
-class TestGAOperator(unittest.TestCase):
+class TestGAOperators(unittest.TestCase):
     def setUp(self):
         self.ga = GeneticAlgorithm(population_size, units, n_periods, operation_coef, cf, demands, criterion,
                                    generations, selection_rate)
