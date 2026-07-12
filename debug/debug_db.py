@@ -1,5 +1,4 @@
 from backend.units import Unit
-from backend.ga import Population
 import numpy as np
 
 # CREATING INSTANCES FOR TESTING & DEBUGGING
@@ -34,5 +33,9 @@ demands = [
 
 criterion = "Cost"
 
-generations = 50
+generations = 10
 selection_rate = 0.6
+
+selection_op = "tournament"
+crossover_op = "UNIFORM"
+mutation_op = "SHIFT"

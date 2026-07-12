@@ -193,6 +193,9 @@ class GeneticAlgorithm:
         while cross_point_1 == cross_point_2:
             cross_point_2 = random.randint(0, self.n_periods - 1)
 
+        if cross_point_1 > cross_point_2:
+            cross_point_1, cross_point_2 = cross_point_2, cross_point_1
+
         new_schedule_1 = parent1.schedule[:cross_point_1] + parent2.schedule[cross_point_1:cross_point_2] + parent1.schedule[cross_point_2:]
         new_schedule_2 = parent2.schedule[:cross_point_1] + parent1.schedule[cross_point_1:cross_point_2] + parent2.schedule[cross_point_2:]
 
@@ -294,10 +297,11 @@ class GeneticAlgorithm:
                 self.mutation_shift(individual)
             else:
                 self.mutation_swap(individual)
+            self.adjust_fitness(individual)
 
     def elitism(self, rate=0.1):
         n_elite = int(rate * len(self.population.individuals))
-        elite = sorted(self.population.individuals,key=lambda individual: individual.fitness)[:n_elite]
+        elite = sorted(self.population.individuals, key=lambda individual: individual.fitness, reverse=True)[:n_elite]
         return elite
 
     def replace(self, elite, offspring):
