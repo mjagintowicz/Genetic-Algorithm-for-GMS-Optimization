@@ -1,6 +1,7 @@
 from units import Unit, Schedule
 from collections import Counter
 import random
+from copy import deepcopy
 
 class Individual:
     def __init__(self, schedule_list):
@@ -64,7 +65,8 @@ class Population:
 
 class GeneticAlgorithm:
 
-    def __init__(self, population_size, units, n_periods, operation_coef, cf, demands, criterion, generations, selection_rate=0.6, crossover_op="1_POINT"):
+    def __init__(self, population_size, units, n_periods, operation_coef, cf, demands, criterion, generations,
+                 selection_rate=0.6, selection_op="roulette", crossover_op="1_POINT", mutation_rate=0.05, mutation_op="SHIFT"):
 
         self.population = Population(population_size, units, n_periods, operation_coef, cf, demands, criterion)
         self.next_population = []
@@ -79,8 +81,11 @@ class GeneticAlgorithm:
         self.demands = demands
         self.criterion = criterion
         self.crossover_op = crossover_op
+        self.mutation_rate = mutation_rate
+        self.mutation_op = mutation_op
+        self.selection_op = selection_op
 
-        self.best = None
+        self.best = max(self.population.individuals, key=lambda individual: individual.fitness)
 
     def selection_roulette(self):
 
@@ -116,12 +121,18 @@ class GeneticAlgorithm:
         return parents
 
 
-    def selection(self, mode):
+    def selection(self):
 
-        if mode == "roulette":
-            return self.selection_roulette()
+        if self.selection_op == "roulette":
+            parents = self.selection_roulette()
         else:
-            return self.selection_tournament()
+            parents = self.selection_tournament()
+
+        if len(parents) % 2 == 1:
+            parents.pop()
+
+        random.shuffle(parents)
+        return parents
 
 
     def adjust_fitness(self, individual):
@@ -205,44 +216,110 @@ class GeneticAlgorithm:
         return new_schedule_1, new_schedule_2
 
 
-    def crossover(self, parent_1, parent_2):
+    def crossover(self, parents, target_size):
         """
         The main crossover function.
         1. Creates new schedules using the picked operator.
         2. Turns the schedules into the individuals.
         3. Repairs.
         """
-        if self.crossover_op == "1_POINT":
-            new_schedule_1, new_schedule_2 = self.crossover_1_point(parent_1, parent_2)
-        elif self.crossover_op == "2_POINT":
-            new_schedule_1, new_schedule_2 = self.crossover_2_point(parent_1, parent_2)
-        else:
-            new_schedule_1, new_schedule_2 = self.crossover_uniform(parent_1, parent_2)
 
-        individual_1 = Individual(new_schedule_1)
-        individual_2 = Individual(new_schedule_2)
+        offspring = []
 
-        self.repair(individual_1)
-        self.repair(individual_2)
+        while len(offspring) < target_size:
+            parent_1, parent_2 = random.sample(parents, 2)
 
-        return individual_1, individual_2
+            if self.crossover_op == "1_POINT":
+                new_schedule_1, new_schedule_2 = self.crossover_1_point(parent_1, parent_2)
+            elif self.crossover_op == "2_POINT":
+                new_schedule_1, new_schedule_2 = self.crossover_2_point(parent_1, parent_2)
+            else:
+                new_schedule_1, new_schedule_2 = self.crossover_uniform(parent_1, parent_2)
 
+            individual_1 = Individual(new_schedule_1)
+            individual_2 = Individual(new_schedule_2)
 
-    def mutate(self):
-        pass
+            self.repair(individual_1)
+            self.repair(individual_2)
 
-    def recombine(self):
+            offspring.append(individual_1)
+            offspring.append(individual_2)
+
+        return offspring[:target_size]
+
+    def mutation_shift(self, individual):
         """
-        After crossover and mutation -- creates a final new population.
+        1. Selects a maintenance to shift.
+        2. Moves it to a different free slot.
         """
-        self.population = self.next_population
-        self.next_population = []
+
+        while True:
+            idx_1 = random.randint(0, self.n_periods - 1)
+            unit = individual.schedule[idx_1]
+            if unit != 0:
+                break
+
+        free_periods = [i for i, x in enumerate(individual.schedule) if x == 0]
+        idx_2 = random.choice(free_periods)
+
+        individual.schedule[idx_1] = 0
+        individual.schedule[idx_2] = unit
+
+    def mutation_swap(self, individual):
+        """
+        1. Selects two maintenances.
+        2. Swaps their places.
+        """
+        while True:
+            idx_1 = random.randint(0, self.n_periods - 1)
+            unit_1 = individual.schedule[idx_1]
+            if unit_1 != 0:
+                break
+        while True:
+            idx_2 = random.randint(0, self.n_periods - 1)
+            unit_2 = individual.schedule[idx_2]
+            if unit_2 != 0 and idx_1 != idx_2:
+                break
+
+        individual.schedule[idx_1] = unit_2
+        individual.schedule[idx_2] = unit_1
+
+
+    def mutation(self, offspring):
+
+        n_to_mutate = int(self.mutation_rate * len(offspring))
+        individuals = random.sample(offspring, n_to_mutate)
+        for individual in individuals:
+            if self.mutation_op == "SHIFT":
+                self.mutation_shift(individual)
+            else:
+                self.mutation_swap(individual)
+
+    def elitism(self, rate=0.1):
+        n_elite = int(rate * len(self.population.individuals))
+        elite = sorted(self.population.individuals,key=lambda individual: individual.fitness)[:n_elite]
+        return elite
+
+    def replace(self, elite, offspring):
+        """
+        Replaces the population with elite and offspring. Checks if there's a better solution.
+        """
+        self.population.individuals = elite + offspring
+        best_tmp = max(self.population.individuals, key=lambda individual: individual.fitness)
+        if best_tmp.fitness > self.best.fitness:
+            self.best = best_tmp
 
     def run(self):
         """
         Runs the main Genetic Algorithm loop.
         """
-        for i in range(self.generations):
-            continue
+        for gen in range(self.generations):
+            elite = deepcopy(self.elitism())
+            parents = self.selection()
+            target_size = self.population_size - len(elite)
+            offspring = deepcopy(self.crossover(parents, target_size))
+            self.mutation(offspring)
+
+            self.replace(elite, offspring)
 
         return self.best
