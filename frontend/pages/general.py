@@ -1,5 +1,6 @@
 import streamlit as st
+from app_state import app
 
 def main_page():
-    st.title("Generator Maintenance Scheduling with Genetic Algorithm")
-    st.caption("Hello!")
+    st.title(app.lang_dict["general_title"])
+    st.caption(app.lang_dict["general_caption"])

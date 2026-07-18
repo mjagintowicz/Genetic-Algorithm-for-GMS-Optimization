@@ -7,13 +7,19 @@ from backend.units import Unit
 
 
 class AppSetup:
-    def __init__(self, K, T, cf_1, cf_2, operation_coef):
+    def __init__(self, K, T, cf_1, cf_2, operation_coef, population_size, generations, criterion,
+                 selection_op, lang_dict):
         self.K = K
         self.T = T
         self.cf_1 = cf_1
         self.cf_2 = cf_2
         self.operation_coef = operation_coef
         self.units = []
+        self.population_size = population_size
+        self.generations = generations
+        self.criterion = criterion
+        self.selection_op = selection_op
+        self.lang_dict = lang_dict
 
     def assign_units(self, power_vec):
         self.units = []

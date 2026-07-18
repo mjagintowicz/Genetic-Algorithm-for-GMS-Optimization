@@ -7,16 +7,16 @@ def on_change_ops():
 
 def costs_page():
 
-    st.header("Costs Functions")
+    st.header(app.lang_dict["costs_header"])
 
-    st.subheader("Maintenance cost")
-    st.caption("Maintenance costs are described by step functions. Use the default functions or define your own.")
+    st.subheader(app.lang_dict["costs_maintenance"])
+    st.caption(app.lang_dict["maintenance_caption"])
     st.session_state["main_chart"] = st.pyplot(app.maintenance_cost_chart())
 
-    st.subheader("Operation cost")
-    st.caption("Operation costs are linear. You can adjust the function coefficient.")
+    st.subheader(app.lang_dict["costs_operation"])
+    st.caption(app.lang_dict["operation_caption"])
 
-    st.number_input(key="ops_coef", label="Operation cost coefficient",
+    st.number_input(key="ops_coef", label=app.lang_dict["operation_coef"],
                     min_value=0.0, max_value=10.0, value=app.operation_coef,
                     on_change=on_change_ops)
     st.session_state["ops_chart"] = st.pyplot(app.operation_cost_chart())

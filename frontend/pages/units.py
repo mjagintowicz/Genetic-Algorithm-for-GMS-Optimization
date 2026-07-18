@@ -28,9 +28,9 @@ def on_change_size():
 
 
 def units_page():
-    st.header("Generating units data")
-    st.caption("The number of generating units corresponds with the problem instance size. The default size is 20.")
-    st.warning("Changing the size will reset all the units data!")
+    st.header(app.lang_dict["units_header"])
+    st.caption(app.lang_dict["units_caption"])
+    st.warning(app.lang_dict["units_warning"])
 
     st.number_input(key="K", label="Number of units",
                     min_value=1, max_value=50, value=app.K,
