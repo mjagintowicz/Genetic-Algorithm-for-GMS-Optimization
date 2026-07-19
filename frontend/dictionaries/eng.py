@@ -2,6 +2,7 @@ dict_ENG = {
     "lang": "ENG",
     "general_nav_title": "Introduction",
     "units_nav_title": "Units",
+    "demands_nav_title": "Demand",
     "costs_nav_title": "Costs",
     "algorithm_params_nav_title": "Algorithm Parameters",
 
@@ -12,7 +13,9 @@ dict_ENG = {
     "units_caption": "The number of generating units corresponds with the problem instance size. The default size is 20.",
     "units_warning": "Changing the size will reset all the units data!",
     "units_number": "Number of units",
-    "units_power": "Power generation per period",
+
+    "demands_header": "Power demand data",
+    "period_number": "Number of periods",
 
     "costs_header": "Costs",
     "costs_maintenance": "Maintenance cost",
@@ -31,4 +34,10 @@ dict_ENG = {
     "selection": "Selection operators",
     "selection_roulette": "Roulette",
     "selection_tournament": "Tournament",
+    "selection_rate": "Selection rate",
+
+    "crossover": "Crossover operators",
+
+    "mutation": "Mutation operators",
+    "mutation_rate": "Mutation rate",
 }

@@ -1,6 +1,6 @@
 import streamlit as st
 import numpy as np
-from frontend.pages import general, units, costs, algorithm_params
+from frontend.pages import general, units, costs, algorithm_params, demands
 from app_state import app
 from frontend.dictionaries import eng, pl
 
@@ -19,6 +19,7 @@ st.sidebar.selectbox("", options=lang_options.keys(), key="language", on_change=
 pg = st.navigation([
     st.Page(general.main_page, title=app.lang_dict["general_nav_title"]),
     st.Page(units.units_page, title=app.lang_dict["units_nav_title"]),
+    st.Page(demands.demands_page, title=app.lang_dict["demands_nav_title"]),
     st.Page(costs.costs_page, title=app.lang_dict["costs_nav_title"]),
     st.Page(algorithm_params.algorithm_params_page, title=app.lang_dict["algorithm_params_nav_title"]),
 ])

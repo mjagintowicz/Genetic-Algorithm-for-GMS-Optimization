@@ -32,7 +32,7 @@ def units_page():
     st.caption(app.lang_dict["units_caption"])
     st.warning(app.lang_dict["units_warning"])
 
-    st.number_input(key="K", label="Number of units",
+    st.number_input(key="K", label=app.lang_dict["units_number"],
                     min_value=1, max_value=50, value=app.K,
                     on_change=on_change_size)
 

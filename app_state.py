@@ -15,4 +15,8 @@ app = AppSetup(20,
                50,
                "COST",
                "roulette",
+               0.6,
+               "1-POINT",
+               "SWAP",
+            0.05,
                eng.dict_ENG)

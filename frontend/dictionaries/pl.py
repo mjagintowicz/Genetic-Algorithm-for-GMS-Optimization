@@ -2,6 +2,7 @@ dict_PL = {
     "lang": "PL",
     "general_nav_title": "Wprowadzenie",
     "units_nav_title": "Jednostki",
+    "demands_nav_title": "Zapotrzebowanie",
     "costs_nav_title": "Koszty",
     "algorithm_params_nav_title": "Parametry algorytmu",
 
@@ -13,6 +14,9 @@ dict_PL = {
     "units_warning": "Zmiana rozmiaru spowoduje zresetowanie wszystkich danych jednostek!",
     "units_number": "Liczba jednostek",
     "units_power": "Moc wytwarzana w okresie",
+
+    "demands_header": "Zapotrzebowanie energetyczne w okresach",
+    "period_number": "Liczba okresów",
 
     "costs_header": "Koszty",
     "costs_maintenance": "Koszty remontów",
@@ -31,4 +35,10 @@ dict_PL = {
     "selection": "Operatory selekcji",
     "selection_roulette": "Ruletka",
     "selection_tournament": "Turniej",
+    "selection_rate": "Prawdopodobieństwo selekcji",
+
+    "crossover": "Operatory krzyżowania",
+
+    "mutation": "Operatory mutacji",
+    "mutation_rate": "Prawdopodobieństwo mutacji",
 }
