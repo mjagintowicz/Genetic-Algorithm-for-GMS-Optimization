@@ -28,7 +28,7 @@ def on_change_size():
 
 
 def demands_page():
-    st.header(app.lang_dict["demands_header"])
+    st.title(app.lang_dict["demands_header"])
 
     st.number_input(key="T", label=app.lang_dict["period_number"],
                     min_value=2, max_value=25, value=app.T,

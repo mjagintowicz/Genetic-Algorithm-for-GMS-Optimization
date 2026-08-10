@@ -28,7 +28,7 @@ def on_change_size():
 
 
 def units_page():
-    st.header(app.lang_dict["units_header"])
+    st.title(app.lang_dict["units_header"])
     st.caption(app.lang_dict["units_caption"])
     st.warning(app.lang_dict["units_warning"])
 

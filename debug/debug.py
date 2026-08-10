@@ -23,4 +23,3 @@ broken_ind = parents_t[0]
 
 # Debug the algorithm
 best = ga.run()
-print(best)

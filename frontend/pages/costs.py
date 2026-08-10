@@ -6,7 +6,7 @@ def on_change_ops():
 
 def costs_page():
 
-    st.header(app.lang_dict["costs_header"])
+    st.title(app.lang_dict["costs_header"])
 
     st.subheader(app.lang_dict["costs_maintenance"])
     st.caption(app.lang_dict["maintenance_caption"])

@@ -70,6 +70,6 @@ class AppSetup:
     def run(self):
         # init
         # alg
-        pass
+        print("Running...")
 
 #app_setup.run()

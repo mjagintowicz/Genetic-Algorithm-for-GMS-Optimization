@@ -49,4 +49,6 @@ dict_PL = {
     "unit_num": "Numer jednostki",
 
     "results_nav_title": "Wyniki",
+
+    "run": "Uruchom!"
 }

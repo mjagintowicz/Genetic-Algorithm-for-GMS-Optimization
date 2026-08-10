@@ -48,4 +48,6 @@ dict_ENG = {
     "unit_num": "Unit number",
 
     "results_nav_title": "Results",
+
+    "run": "Run!",
 }
