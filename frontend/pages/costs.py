@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from app_state import app
 
 def on_change_ops():

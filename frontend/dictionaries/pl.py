@@ -41,4 +41,12 @@ dict_PL = {
 
     "mutation": "Operatory mutacji",
     "mutation_rate": "Prawdopodobieństwo mutacji",
+
+    "periods_since": "Liczba okresów od ostatniej konserwacji",
+    "cost": "Koszt",
+
+    "period": "Okres",
+    "unit_num": "Numer jednostki",
+
+    "results_nav_title": "Wyniki",
 }

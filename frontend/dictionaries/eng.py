@@ -40,4 +40,12 @@ dict_ENG = {
 
     "mutation": "Mutation operators",
     "mutation_rate": "Mutation rate",
+
+    "periods_since": "Periods since last maintenance",
+    "cost": "Cost",
+
+    "period": "Period",
+    "unit_num": "Unit number",
+
+    "results_nav_title": "Results",
 }

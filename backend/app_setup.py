@@ -26,6 +26,8 @@ class AppSetup:
         self.mutation_rate = mutation_rate
         self.lang_dict = lang_dict
 
+        self.schedule = []
+
     def assign_units(self, power_vec):
         self.units = []
         for k in range(self.K):
@@ -39,8 +41,8 @@ class AppSetup:
     def maintenance_cost_chart(self):
         chart = Chart(x=range(max(len(self.cf_1), len(self.cf_2))),
                       y=[self.cf_1, self.cf_2],
-                      x_label="Periods since last maintenance",
-                      y_label="Cost",
+                      x_label=self.lang_dict["periods_since"],
+                      y_label=self.lang_dict["cost"],
                       legend=[r'$cf_1$', r'$cf_2$'])
         return chart.cost_function_plot()
 
@@ -48,10 +50,22 @@ class AppSetup:
         x = np.arange(0, np.size(self.cf_1), 1)
         y = x * self.operation_coef
         chart = Chart(x=x, y=[y],
-                      x_label="Periods since last maintenance",
-                      y_label="Cost",
-                      legend=["Operation cost"])
+                      x_label=self.lang_dict["periods_since"],
+                      y_label=self.lang_dict["cost"],
+                      legend=[self.lang_dict["costs_operation"]])
         return chart.cost_function_plot()
+
+    def schedule_chart(self):
+        x = np.arange(1, self.T, 1)
+        y = self.schedule
+
+        x = np.arange(1, 20, 1)
+        y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 1, 4, 5, 6, 7, 8,]
+
+        chart = Chart(x=x, y=[y],
+                      x_label=self.lang_dict["period"],
+                      y_label=self.lang_dict["unit_num"],)
+        return chart.schedule_plot()
 
     def run(self):
         # init
