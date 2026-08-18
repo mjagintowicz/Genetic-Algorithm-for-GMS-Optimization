@@ -1,7 +1,8 @@
-from units import Unit, Schedule
+from backend.units import Schedule
 from collections import Counter
 import random
 from copy import deepcopy
+from time import time
 
 class Individual:
     def __init__(self, schedule_list):
@@ -9,13 +10,13 @@ class Individual:
         self.fitness = 0.0
 
     def __repr__(self):
-        return f"IND: {self.schedule}\nFIT: {self.fitness}"
+        return f"IND: {self.schedule}\nFIT: {self.fitness}\n"
 
-    def calculate_fitness_cost(self, operation_coef, cf):
+    def calculate_fitness_cost(self, operation_coef, cf, units, demands):
 
         T = len(self.schedule)
         K = max(self.schedule)
-        for k in range(K):  # for each unit analyze the schedules for calcs
+        for k in range(1, K+1):  # for each unit analyze the schedules for calcs
             periods_worked = 0
             last_maintenance_period = 0
             for t in range(T):
@@ -26,8 +27,13 @@ class Individual:
                     last_maintenance_period = t
                 else:   # if there is no maintenance of k, just keep working
                     periods_worked += 1
-            self.fitness += operation_coef * periods_worked   # if there is some unadded work in the end - add it now
-            self.fitness = 1 / (self.fitness + 1) # transformed bc it should be minimized
+            # if there is some unadded work in the end - add it now
+            self.fitness += operation_coef * periods_worked
+
+        # penalty for insufficient generated power
+        self.fitness += self.penalty(units, demands)
+        # cost -> fitness because GA maximizes fitness
+        self.fitness = 1 / (self.fitness + 1)
 
     def calculate_fitness_reliability(self, units, demands):
 
@@ -36,10 +42,44 @@ class Individual:
         for t in range(T):
             k_main = self.schedule[t]   # for each t check which k was maintained
             power_generated = 0
-            for k in range(K):          # all units except this one worked - sum it's power
+            for k in range(1, K+1):          # all units except this one worked - sum it's power
                 if k != k_main:
-                    power_generated += units[k].power
-            self.fitness += power_generated - demands[t]        # check if the demand was exceeded for the t
+                    power_generated += units[k-1].power
+            # check if the demand was exceeded for the t
+            self.fitness += power_generated - demands[t]
+
+    def nett_reserve(self, units, demands):
+
+        """
+        Nett reserve is power_generated - demand. Should be > 0.
+        :param units:
+        :param demands:
+        :return:
+        """
+
+        nett_reserve = []
+        for t, k_main in enumerate(self.schedule):
+            power_generated = 0
+            for k in units:
+                if k.idx != k_main:
+                    power_generated += k.power
+            nett_reserve.append(power_generated - demands[t])
+
+        return nett_reserve
+
+    def penalty(self, units, demands):
+        """
+        Penalty check for the cost criterion. If the demand isn't fulfilled adds penalty to cost.
+        :param units:
+        :param demands:
+        :return:
+        """
+        nett_reserve = self.nett_reserve(units, demands)
+        penalty = 0
+        for reserve in nett_reserve:
+            if reserve < 0:
+                penalty += reserve**2
+        return penalty
 
 
 class Population:
@@ -50,8 +90,8 @@ class Population:
         for i in range(size):
             schedule = Schedule(units, n_periods)
             individual = Individual(schedule.schedule)
-            if criterion == "Cost":
-                individual.calculate_fitness_cost(operation_coef, cf)
+            if criterion == "COST":
+                individual.calculate_fitness_cost(operation_coef, cf, units, demands)
             else:
                 individual.calculate_fitness_reliability(units, demands)
             self.individuals.append(individual)
@@ -66,7 +106,8 @@ class Population:
 class GeneticAlgorithm:
 
     def __init__(self, population_size, units, n_periods, operation_coef, cf, demands, criterion, generations,
-                 selection_rate=0.6, selection_op="roulette", crossover_op="1_POINT", mutation_rate=0.05, mutation_op="SHIFT"):
+                 selection_rate=0.6, selection_op="roulette", crossover_op="1_POINT", mutation_rate=0.05, mutation_op="SHIFT",
+                 elitism=False):
 
         self.population = Population(population_size, units, n_periods, operation_coef, cf, demands, criterion)
         self.next_population = []
@@ -84,8 +125,13 @@ class GeneticAlgorithm:
         self.mutation_rate = mutation_rate
         self.mutation_op = mutation_op
         self.selection_op = selection_op
+        self.elitism = elitism
 
         self.best = max(self.population.individuals, key=lambda individual: individual.fitness)
+        self.best_abs = [self.best.fitness] # best existing overall individual
+        self.best_per_gen = [self.best.fitness] # best individual in each population
+
+        self.time = 0.0
 
     def selection_roulette(self):
 
@@ -132,13 +178,14 @@ class GeneticAlgorithm:
             parents.pop()
 
         random.shuffle(parents)
+        print("Parents selected!")
         return parents
 
 
     def adjust_fitness(self, individual):
 
-        if self.criterion == "Cost":
-            individual.calculate_fitness_cost(self.operation_coef, self.cf)
+        if self.criterion == "COST":
+            individual.calculate_fitness_cost(self.operation_coef, self.cf, self.units, self.demands)
         else:
             individual.calculate_fitness_reliability(self.units, self.demands)
 
@@ -248,6 +295,9 @@ class GeneticAlgorithm:
             offspring.append(individual_1)
             offspring.append(individual_2)
 
+
+        print("Crossed!")
+
         return offspring[:target_size]
 
     def mutation_shift(self, individual):
@@ -298,8 +348,9 @@ class GeneticAlgorithm:
             else:
                 self.mutation_swap(individual)
             self.adjust_fitness(individual)
+        print("Mutated!")
 
-    def elitism(self, rate=0.1):
+    def apply_elitism(self, rate=0.1):
         n_elite = int(rate * len(self.population.individuals))
         elite = sorted(self.population.individuals, key=lambda individual: individual.fitness, reverse=True)[:n_elite]
         return elite
@@ -312,18 +363,29 @@ class GeneticAlgorithm:
         best_tmp = max(self.population.individuals, key=lambda individual: individual.fitness)
         if best_tmp.fitness > self.best.fitness:
             self.best = best_tmp
+        self.best_abs.append(self.best.fitness)
+        self.best_per_gen.append(best_tmp.fitness)
+
+    def get_result(self):
+        """
+        Function preparing the result individual for display.
+        :return:
+        """
+        return self.best, self.best_abs, self.best_per_gen, self.time, self.generations
 
     def run(self):
         """
         Runs the main Genetic Algorithm loop.
         """
+        start = time()
         for gen in range(self.generations):
-            elite = deepcopy(self.elitism())
+            print("Gen: ", gen)
+            elite = deepcopy(self.apply_elitism())
             parents = self.selection()
             target_size = self.population_size - len(elite)
             offspring = deepcopy(self.crossover(parents, target_size))
             self.mutation(offspring)
 
             self.replace(elite, offspring)
-
-        return self.best
+        end = time()
+        self.time = end - start

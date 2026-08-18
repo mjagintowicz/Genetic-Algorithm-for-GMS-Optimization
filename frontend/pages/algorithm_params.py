@@ -43,6 +43,9 @@ def algorithm_params_page():
                     min_value=0.01, max_value=1.0, value=app.selection_rate,
                     on_change=on_param_change, args=("selection_rate",))
 
+    st.subheader(app.lang_dict["elitism"])
+    st.checkbox(key="elitism", label=app.lang_dict["elitism"], on_change=on_param_change, args=("elitism",))
+
     st.subheader(app.lang_dict["crossover"])
     st.radio(key="crossover_op", label=app.lang_dict["crossover"], label_visibility="collapsed",
              options=crossover_ops, index=crossover_ops.index(app.crossover_op),
@@ -58,4 +61,4 @@ def algorithm_params_page():
                     min_value=0.01, max_value=1.0, value=app.mutation_rate,
                     on_change=on_param_change, args=("mutation_rate",))
     
-    st.button(app.lang_dict["run"], key="run", on_click=app.run(), width="stretch", type="primary")
+    st.button(app.lang_dict["run"], key="run", on_click=app.run, width="stretch", type="primary")

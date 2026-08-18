@@ -16,7 +16,7 @@ units = [
     Unit(idx=10, power=150),
 ]
 
-population_size = 20
+population_size = 50
 
 n_periods = 20
 
@@ -33,9 +33,11 @@ demands = [
 
 criterion = "Cost"
 
-generations = 10
+generations = 100
 selection_rate = 0.6
 
 selection_op = "tournament"
 crossover_op = "UNIFORM"
 mutation_op = "SHIFT"
+
+elitism = False

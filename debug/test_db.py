@@ -1,5 +1,6 @@
 from backend.units import Unit
 import numpy as np
+from backend.ga import GeneticAlgorithm
 
 U = 21
 units = [
@@ -55,7 +56,7 @@ def maintenance_cost_2(periods):
 
 # GA experiment parameters
 population_size = 100 # [50 100 200]
-generations = 1000  # [100, 500, 1000, 2000, 5000]
+generations = 10  # [100, 500, 1000, 2000, 5000]
 selection_rate = 0.6 # [0.4, 0.6, 0.8, 1]
 mutation_rate = 0.05 # [0.01 0.05 0.1 0.2]
 
@@ -65,4 +66,15 @@ selection_op = "roulette"
 crossover_op = "1-POINT"
 mutation_op = "SHIFT"
 
+cf=np.concatenate((np.full(3, 50),
+                np.full(7, 150),
+                np.full(9, 300),
+                np.full(6, 500),
+                np.full(27, 500)))
+
+
 # ~30 runs for each experiment
+ga = GeneticAlgorithm(population_size, units, T, 10, cf, demands, criterion, generations,
+                      selection_rate=selection_rate, selection_op=selection_op, crossover_op=crossover_op,
+                      mutation_op=mutation_op, elitism=False)
+print(ga.run())

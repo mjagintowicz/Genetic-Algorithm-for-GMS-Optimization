@@ -50,4 +50,34 @@ dict_ENG = {
     "results_nav_title": "Results",
 
     "run": "Run!",
+    "elitism": "Elitism?",
+    "fitness": "Fitness",
+    "best_abs": "Best overall fitness",
+    "best_rel": "Best fitness per generation",
+
+    "results": "Results",
+
+    "intro_gms": "Generator Maintenance Scheduling (GMS) aims to optimize a maintenance schedule for generating units over a specified planning horizon. The goal is to determine when individual units should be taken out of operation for maintenance while ensuring that the required power demand can be met. The resulting schedule should satisfy the imposed constraints while minimizing the total cost associated with the operation and maintenance of generating units or maximizing the generated power nett reserve.",
+    "about_app": "About the application",
+    "about_text": "This application provides an interactive environment for solving GMS Problem using a Genetic Algorithm (GA). It allows users to define the input data, configure the optimization algorithm, generate a maintenance schedule, and analyze the obtained results.",
+    "instruction": "How does it work?",
+    "instruction_text": """
+                        1. **Define input data**<br>
+                         Enter the parameters of generating units, power demand, and cost functions. 
+                         
+                        2. **Configure the algorithm**<br>
+                         Set the GA parameters and select the desired genetic operators. 
+                         
+                        3. **Run optimization**<br>
+                         Run the algorithm to search for a high-quality maintenance schedule. 
+                         
+                        4. **Analyze results**<br>
+                         Examine the resulting schedule and objective function value.
+                        """,
+    "sources": "Based on",
+    "sources_urls": """
+    - [Matheuristics for scheduling of maintenance service with linear operation cost and step function maintenance cost](https://www.sciencedirect.com/science/article/pii/S0377221723007580)
+    - [A Simulated Annealing based approach to solve the generator maintenance scheduling problem](https://www.sciencedirect.com/science/article/pii/S0378779611000253)
+    - [Benchmarks for maintenance scheduling problems in power generation](https://www.researchgate.net/publication/260336320_Benchmarks_for_maintenance_scheduling_problems_in_power_generation)
+    """
 }

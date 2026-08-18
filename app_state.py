@@ -19,4 +19,7 @@ app = AppSetup(20,
                "1-POINT",
                "SWAP",
             0.05,
-               eng.dict_ENG)
+               eng.dict_ENG,
+               False,
+               np.concatenate((np.full(5, 100),
+                               np.full(20, 600))))

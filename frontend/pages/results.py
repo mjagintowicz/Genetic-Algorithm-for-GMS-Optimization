@@ -4,4 +4,7 @@ from app_state import app
 
 def results_page():
 
-    st.session_state["res_chart"] = st.pyplot(app.schedule_chart())
+    st.header(app.lang_dict["results"])
+
+    st.session_state["schedule_chart"] = st.pyplot(app.schedule_chart())
+    st.session_state["convergence_chart"] = st.pyplot(app.convergence_chart())

@@ -50,5 +50,35 @@ dict_PL = {
 
     "results_nav_title": "Wyniki",
 
-    "run": "Uruchom!"
+    "run": "Uruchom!",
+    "elitism": "Elitaryzm?",
+    "fitness": "Przystosowanie",
+    "best_abs": "Najlepsze dotychczasowe",
+    "best_rel": "Najlepsze w generacji",
+
+    "results": "Wyniki",
+
+    "intro_gms": "Problem planowania konserwacji jednostek wytwórczych (ang. Generator Maintenance Scheduling, GMS) polega na optymalizacji harmonogramu prac konserwacyjnych i remontowych jednostek wytwórczych w określonym horyzoncie czasowym. Celem jest ustalenie terminów wyłączenia poszczególnych jednostek z eksploatacji na czas remontu, przy jednoczesnym zapewnieniu możliwości pokrycia wymaganego zapotrzebowania na moc. Otrzymany harmonogram powinien spełniać nałożone ograniczenia oraz minimalizować całkowity koszt związany z eksploatacją i remontami jednostek lub maksymalizować dostępną rezerwę mocy netto.",
+    "about_app": "O aplikacji",
+    "about_text": "Aplikacja zapewnia interaktywne środowisko do rozwiązywania problemu GMS z wykorzystaniem algorytmu genetycznego (GA). Umożliwia zdefiniowanie danych wejściowych, konfigurację algorytmu optymalizacji, wygenerowanie harmonogramu remontów oraz analizę otrzymanych wyników.",
+    "instruction": "Jak to działa?",
+    "instruction_text": """
+                        1. **Zdefiniuj dane wejściowe**<br>
+                           Wprowadź parametry jednostek wytwórczych, zapotrzebowanie na moc oraz funkcje kosztów.
+                        
+                        2. **Skonfiguruj algorytm**<br>
+                           Ustaw parametry algorytmu genetycznego oraz wybierz odpowiednie operatory genetyczne.
+                        
+                        3. **Uruchom optymalizację**<br>
+                           Uruchom algorytm w celu znalezienia rozwiązania o wysokiej jakości.
+                        
+                        4. **Przeanalizuj wyniki**<br>
+                           Przeanalizuj otrzymany harmonogram oraz wartość funkcji celu.
+                        """,
+    "sources": "Źródła",
+    "sources_urls": """
+- [Matheuristics for scheduling of maintenance service with linear operation cost and step function maintenance cost](https://www.sciencedirect.com/science/article/pii/S0377221723007580)
+- [A Simulated Annealing based approach to solve the generator maintenance scheduling problem](https://www.sciencedirect.com/science/article/pii/S0378779611000253)
+- [Benchmarks for maintenance scheduling problems in power generation](https://www.researchgate.net/publication/260336320_Benchmarks_for_maintenance_scheduling_problems_in_power_generation)
+"""
 }

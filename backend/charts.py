@@ -11,7 +11,7 @@ class Chart:
         self.y_label = y_label
         self.legend = legend
 
-    def cost_function_plot(self):
+    def function_plot(self):
         fig, ax = plt.subplots()
         for i in range(len(self.y)):
             ax.plot(self.x, self.y[i], '.:', label=self.legend[i])

@@ -3,35 +3,63 @@ import pandas as pd
 from app_state import app
 
 def create_demands_table():
-    if "demands" not in st.session_state:
-        st.session_state["demands"] = pd.DataFrame(
-            [{"Demand per period": 0}
-             for _ in range(st.session_state["T"])]
-        )
+    if "demands_values" not in st.session_state:
+        st.session_state["demands_values"] = [0.0] * app.T
 
-    df = st.data_editor(
-        st.session_state["demands"],
-        key="demands_editor"
-    )
+    # Odtworzenie wartości widgetów
+    for t in range(app.T):
+        key = f"demand_{t}"
 
-    app.assign_demands(df["Demand per period"].tolist())
+        if key not in st.session_state:
+            st.session_state[key] = st.session_state["demands_values"][t]
 
+    with st.form("demands_form"):
+        for t in range(app.T):
+            col1, col2 = st.columns([1, 3])
+
+            with col1:
+                st.write(f"Period {t + 1}")
+
+            with col2:
+                st.number_input(
+                    "Demand [MW]",
+                    min_value=0.0,
+                    key=f"demand_{t}"
+                )
+
+        submitted = st.form_submit_button("Save")
+
+        if submitted:
+            demands = [
+                st.session_state[f"demand_{t}"]
+                for t in range(app.T)
+            ]
+
+            st.session_state["demands_values"] = demands
+            app.assign_demands(demands)
 
 def on_change_size():
     app.T = st.session_state["T"]
 
-    st.session_state["demands"] = pd.DataFrame(
-        [{"Demand per period": 0}
-         for _ in range(app.T)])
-
+    st.session_state["demands_values"] = [0.0] * app.T
     app.demands = []
 
+    for t in range(52):
+        key = f"demand_{t}"
+
+        if key in st.session_state:
+            del st.session_state[key]
 
 def demands_page():
     st.title(app.lang_dict["demands_header"])
 
-    st.number_input(key="T", label=app.lang_dict["period_number"],
-                    min_value=2, max_value=25, value=app.T,
-                    on_change=on_change_size)
+    st.number_input(
+        key="T",
+        label=app.lang_dict["period_number"],
+        min_value=2,
+        max_value=52,
+        value=app.T,
+        on_change=on_change_size
+    )
 
     create_demands_table()
