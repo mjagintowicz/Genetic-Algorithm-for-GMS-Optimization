@@ -22,8 +22,18 @@ class Chart:
         return fig
 
     def schedule_plot(self):
-        fig = plt.figure()
-        plt.scatter(self.x, self.y, marker='x',)
-        plt.xlabel(self.x_label)
-        plt.ylabel(self.y_label)
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        ax.scatter(self.x, self.y[0], marker="x", s=80, linewidths=2,)
+
+        ax.set_xlabel(self.x_label)
+        ax.set_ylabel(self.y_label)
+
+        ax.set_xticks(np.arange(1, len(self.x) + 1))
+        ax.set_yticks(np.arange(1, max(self.y[0]) + 1))
+
+        ax.grid(True, linestyle="--", alpha=0.25,)
+
+        fig.tight_layout()
+
         return fig

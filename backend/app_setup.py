@@ -64,9 +64,14 @@ class AppSetup:
 
     def schedule_chart(self):
         schedule = self.result[0].schedule
+        periods = np.arange(1, len(schedule) + 1)
 
-        x = np.arange(0, len(schedule), 1)
-        y = schedule
+        x = []
+        y = []
+        for i in range (len(schedule)):
+            if schedule[i] != 0:
+                x.append(periods[i])
+                y.append(schedule[i])
 
         chart = Chart(x=x, y=[y],
                       x_label=self.lang_dict["period"],
@@ -74,7 +79,6 @@ class AppSetup:
         return chart.schedule_plot()
 
     def run(self):
-        st.write(self.generations)
         ga = GeneticAlgorithm(population_size=self.population_size,
                               units=self.units,
                               n_periods=self.T,
@@ -90,9 +94,11 @@ class AppSetup:
                               mutation_op=self.mutation_op,
                               elitism=self.elitism)
         print("Running...")
+
         ga.run()
-        print("Done!")
         self.result = ga.get_result()
+        print("Done!")
+
 
     def convergence_chart(self):
         x = np.arange(0, self.result[4]+1, 1)

@@ -14,6 +14,12 @@ mutation_ops = ["SWAP", "SHIFT"]
 def on_param_change(param_kw):
     setattr(app, param_kw, st.session_state[param_kw])
 
+def on_click():
+    st.session_state["running"] = True
+    app.run()
+    st.session_state["running"] = False
+    st.session_state["done"] = True
+
 def algorithm_params_page():
 
     st.title(app.lang_dict["algorithm_params_header"])
@@ -61,4 +67,10 @@ def algorithm_params_page():
                     min_value=0.01, max_value=1.0, value=app.mutation_rate,
                     on_change=on_param_change, args=("mutation_rate",))
     
-    st.button(app.lang_dict["run"], key="run", on_click=app.run, width="stretch", type="primary")
+    st.button(app.lang_dict["run"], key="run", on_click=on_click, width="stretch", type="primary")
+
+    if st.session_state.get("running", False):
+        st.badge(app.lang_dict["running"], color="yellow")
+
+    if st.session_state.get("done", False):
+        st.badge(app.lang_dict["done"],icon=":material/check:",color="green")

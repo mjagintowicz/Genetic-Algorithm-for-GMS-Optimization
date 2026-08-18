@@ -76,8 +76,16 @@ dict_ENG = {
                         """,
     "sources": "Based on",
     "sources_urls": """
-    - [Matheuristics for scheduling of maintenance service with linear operation cost and step function maintenance cost](https://www.sciencedirect.com/science/article/pii/S0377221723007580)
-    - [A Simulated Annealing based approach to solve the generator maintenance scheduling problem](https://www.sciencedirect.com/science/article/pii/S0378779611000253)
-    - [Benchmarks for maintenance scheduling problems in power generation](https://www.researchgate.net/publication/260336320_Benchmarks_for_maintenance_scheduling_problems_in_power_generation)
-    """
+                    - [Matheuristics for scheduling of maintenance service with linear operation cost and step function maintenance cost](https://www.sciencedirect.com/science/article/pii/S0377221723007580)
+                    - [A Simulated Annealing based approach to solve the generator maintenance scheduling problem](https://www.sciencedirect.com/science/article/pii/S0378779611000253)
+                    - [Benchmarks for maintenance scheduling problems in power generation](https://www.researchgate.net/publication/260336320_Benchmarks_for_maintenance_scheduling_problems_in_power_generation)
+                    """,
+    "saved": "Saved.",
+    "running": "Running...",
+    "done": "Done!",
+
+    "schedule": "Maintenance Schedule",
+    "objective": "Objective Function",
+    "results_missing": "Run the algorithm to get your schedule.",
+
 }

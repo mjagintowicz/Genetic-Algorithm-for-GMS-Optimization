@@ -37,6 +37,7 @@ def create_demands_table():
 
             st.session_state["demands_values"] = demands
             app.assign_demands(demands)
+            st.badge(app.lang_dict["saved"], icon=":material/check:", color="green")
 
 def on_change_size():
     app.T = st.session_state["T"]
@@ -56,7 +57,7 @@ def demands_page():
     st.number_input(
         key="T",
         label=app.lang_dict["period_number"],
-        min_value=2,
+        min_value=app.K,
         max_value=52,
         value=app.T,
         on_change=on_change_size

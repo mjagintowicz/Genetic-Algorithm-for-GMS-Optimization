@@ -37,6 +37,7 @@ def create_units_table():
 
             st.session_state["units_power"] = powers
             app.assign_units(powers)
+            st.badge(app.lang_dict["saved"], icon=":material/check:", color="green")
 
 
 def on_change_size():
@@ -45,7 +46,6 @@ def on_change_size():
     st.session_state["units_power"] = [0.0] * app.K
     app.units = []
 
-    # usunięcie stanów starych widgetów
     for k in range(50):
         key = f"unit_power_{k}"
 
