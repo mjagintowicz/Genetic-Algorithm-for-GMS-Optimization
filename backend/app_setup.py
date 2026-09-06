@@ -5,8 +5,6 @@ import numpy as np
 from backend.charts import Chart
 from backend.units import Unit
 from backend.ga import GeneticAlgorithm
-import streamlit as st
-
 
 class AppSetup:
     def __init__(self, K, T, cf_1, cf_2, operation_coef, population_size, generations, criterion,
@@ -16,7 +14,7 @@ class AppSetup:
         self.cf_1 = cf_1
         self.cf_2 = cf_2
         self.cf = cf
-        self.operation_coef = operation_coef
+        self.ops_coef = operation_coef
         self.units = []
         self.demands = []
         self.population_size = population_size
@@ -33,7 +31,7 @@ class AppSetup:
 
         self.schedule = []
 
-        self.result = [] # self.best, self.best_abs, self.best_per_gen, self.time, self.generations
+        self.result = [] # self.best, self.best_abs, self.best_per_gen, self.time, self.generations, demand_actual
 
     def assign_units(self, power_vec):
         self.units = []
@@ -55,35 +53,19 @@ class AppSetup:
 
     def operation_cost_chart(self):
         x = np.arange(0, np.size(self.cf_1), 1)
-        y = x * self.operation_coef
+        y = x * self.ops_coef
         chart = Chart(x=x, y=[y],
                       x_label=self.lang_dict["periods_since"],
                       y_label=self.lang_dict["cost"],
                       legend=[self.lang_dict["costs_operation"]])
         return chart.function_plot()
 
-    def schedule_chart(self):
-        schedule = self.result[0].schedule
-        periods = np.arange(1, len(schedule) + 1)
-
-        x = []
-        y = []
-        for i in range (len(schedule)):
-            if schedule[i] != 0:
-                x.append(periods[i])
-                y.append(schedule[i])
-
-        chart = Chart(x=x, y=[y],
-                      x_label=self.lang_dict["period"],
-                      y_label=self.lang_dict["unit_num"],)
-        return chart.schedule_plot()
-
     def run(self):
         ga = GeneticAlgorithm(population_size=self.population_size,
                               units=self.units,
                               n_periods=self.T,
                               generations=self.generations,
-                              operation_coef=self.operation_coef,
+                              operation_coef=self.ops_coef,
                               cf=self.cf,
                               demands=self.demands,
                               criterion=self.criterion,
@@ -99,6 +81,21 @@ class AppSetup:
         self.result = ga.get_result()
         print("Done!")
 
+    def schedule_chart(self):
+        schedule = self.result[0].schedule
+        periods = np.arange(1, len(schedule) + 1)
+
+        x = []
+        y = []
+        for i in range(len(schedule)):
+            if schedule[i] != 0:
+                x.append(periods[i])
+                y.append(schedule[i])
+
+        chart = Chart(x=x, y=[y],
+                      x_label=self.lang_dict["period"],
+                      y_label=self.lang_dict["unit_num"], )
+        return chart.schedule_plot()
 
     def convergence_chart(self):
         x = np.arange(0, self.result[4]+1, 1)
@@ -110,4 +107,23 @@ class AppSetup:
                       y_label=self.lang_dict["fitness"],
                       legend=[self.lang_dict["best_abs"], self.lang_dict["best_rel"]])
         return chart.function_plot()
+
+    def power_gen_chart(self):
+        x = np.arange(1, self.T+1, 1)
+        y1 = self.demands
+        y2 = self.result[5]
+
+        chart = Chart(x=x, y=[y1, y2],
+                      x_label=self.lang_dict["period"],
+                      y_label=self.lang_dict["power"],
+                      legend=[self.lang_dict["demand"], self.lang_dict["power_gen"]])
+        return chart.function_plot()
+
+    def prepare_result_values(self):
+        ind = self.result[0]
+        cost = ind.calculate_fitness_cost(self.ops_coef, self.cf, self.units, self.demands)
+        cost =  (1 - cost) / cost
+        reliability = ind.calculate_fitness_reliability(self.units, self.demands)
+
+        return cost, reliability
 

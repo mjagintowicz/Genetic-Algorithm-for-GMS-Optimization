@@ -1,5 +1,4 @@
 import streamlit as st
-import numpy as np
 from frontend.pages import general, units, costs, algorithm_params, demands, results
 from app_state import app
 from frontend.dictionaries import eng, pl

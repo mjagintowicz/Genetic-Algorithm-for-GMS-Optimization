@@ -88,4 +88,8 @@ dict_ENG = {
     "objective": "Objective Function",
     "results_missing": "Run the algorithm to get your schedule.",
 
+    "power": "Power",
+    "demand": "Demand",
+    "power_gen": "Power generated",
+
 }

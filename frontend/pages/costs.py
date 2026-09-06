@@ -4,7 +4,7 @@ from app_state import app
 functions = [r'$cf_1$', r'$cf_2$']
 
 def on_change_ops():
-    app.operation_coef = st.session_state["ops_coef"]
+    app.ops_coef = st.session_state["ops_coef"]
 
 def on_param_change(param_kw):
     setattr(app, param_kw, st.session_state[param_kw])
@@ -24,6 +24,6 @@ def costs_page():
     st.caption(app.lang_dict["operation_caption"])
 
     st.number_input(key="ops_coef", label=app.lang_dict["operation_coef"],
-                    min_value=0.0, max_value=10.0, value=app.operation_coef,
-                    on_change=on_param_change, args=("opes_coef",))
+                    min_value=0.0, max_value=10.0, value=app.ops_coef,
+                    on_change=on_param_change, args=("ops_coef",))
     st.session_state["ops_chart"] = st.pyplot(app.operation_cost_chart())

@@ -2,7 +2,7 @@ from backend.units import Schedule
 from collections import Counter
 import random
 from copy import deepcopy
-from time import time
+from time import time, perf_counter
 
 class Individual:
     def __init__(self, schedule_list):
@@ -13,51 +13,46 @@ class Individual:
         return f"IND: {self.schedule}\nFIT: {self.fitness}\n"
 
     def calculate_fitness_cost(self, operation_coef, cf, units, demands):
-
+        self.fitness = 0
         T = len(self.schedule)
-        K = max(self.schedule)
-        for k in range(1, K+1):  # for each unit analyze the schedules for calcs
-            periods_worked = 0
-            last_maintenance_period = 0
-            for t in range(T):
-                k_main = self.schedule[t]       # unit maintained in t
-                if k_main == k:                 # if there is maintenance add the working costs and reset, add main cost and remember when it was
-                    self.fitness += operation_coef * periods_worked + cf[t - last_maintenance_period]
-                    periods_worked = 0
-                    last_maintenance_period = t
-                else:   # if there is no maintenance of k, just keep working
-                    periods_worked += 1
-            # if there is some unadded work in the end - add it now
-            self.fitness += operation_coef * periods_worked
+        K = len(units)
 
-        # penalty for insufficient generated power
+        for k in range(1, K + 1):
+            periods_worked = 0
+
+            for t in range(T):
+                k_main = self.schedule[t]
+
+                if k_main == k:
+                    if periods_worked > 0:
+                        self.fitness += cf[periods_worked - 1]
+                    elif periods_worked == 0:
+                        self.fitness += cf[periods_worked]
+                    periods_worked = 0
+                else:
+                    periods_worked += 1
+                    self.fitness += operation_coef * periods_worked
+
         self.fitness += self.penalty(units, demands)
-        # cost -> fitness because GA maximizes fitness
         self.fitness = 1 / (self.fitness + 1)
+        return self.fitness
 
     def calculate_fitness_reliability(self, units, demands):
-
         T = len(self.schedule)
-        K = max(self.schedule)
+        K = len(units)
+        reserves = []
+
         for t in range(T):
-            k_main = self.schedule[t]   # for each t check which k was maintained
-            power_generated = 0
-            for k in range(1, K+1):          # all units except this one worked - sum it's power
-                if k != k_main:
-                    power_generated += units[k-1].power
-            # check if the demand was exceeded for the t
-            self.fitness += power_generated - demands[t]
+            k_main = self.schedule[t]
+            power_generated = sum(units[k - 1].power for k in range(1, K + 1) if k != k_main)
+            reserves.append(power_generated - demands[t])
+
+        self.fitness = min(reserves)
+        return self.fitness
 
     def nett_reserve(self, units, demands):
-
-        """
-        Nett reserve is power_generated - demand. Should be > 0.
-        :param units:
-        :param demands:
-        :return:
-        """
-
         nett_reserve = []
+
         for t, k_main in enumerate(self.schedule):
             power_generated = 0
             for k in units:
@@ -68,14 +63,9 @@ class Individual:
         return nett_reserve
 
     def penalty(self, units, demands):
-        """
-        Penalty check for the cost criterion. If the demand isn't fulfilled adds penalty to cost.
-        :param units:
-        :param demands:
-        :return:
-        """
         nett_reserve = self.nett_reserve(units, demands)
         penalty = 0
+
         for reserve in nett_reserve:
             if reserve < 0:
                 penalty += reserve**2
@@ -178,7 +168,6 @@ class GeneticAlgorithm:
             parents.pop()
 
         random.shuffle(parents)
-        print("Parents selected!")
         return parents
 
 
@@ -197,6 +186,7 @@ class GeneticAlgorithm:
         2. Finds free maintenance slots.
         3. If there are not enough slots, a random unit which is maintained > 1 times may free its slot.
         4. Replaces random available slot with the maintenance of the missing unit.
+        5. Fixes the consecutive maintenance issue so that the unit can't be maintained for longer than 1 period at once.
         5. Recalculates fitness.
         """
         counts = Counter(individual.schedule)
@@ -219,6 +209,25 @@ class GeneticAlgorithm:
 
         for (u, t) in zip(missing_units, free_periods):
             individual.schedule[t] = u
+
+        # consecutive maintenance fix
+        for t in range(1, self.n_periods):
+
+            if individual.schedule[t] != 0 and individual.schedule[t] == individual.schedule[t - 1]:
+                unit = individual.schedule[t]
+                unit_periods = [i for i, x in enumerate(individual.schedule) if x == unit]
+                valid_free_periods = []
+
+                for period in range(self.n_periods):
+                    if individual.schedule[period] != 0:
+                        continue
+                    if all(abs(period - p) >= 2 for p in unit_periods):
+                        valid_free_periods.append(period)
+
+                if valid_free_periods:
+                    new_period = random.choice(valid_free_periods)
+                    individual.schedule[new_period] = unit
+                    individual.schedule[t] = 0
 
         self.adjust_fitness(individual)
 
@@ -267,13 +276,6 @@ class GeneticAlgorithm:
 
 
     def crossover(self, parents, target_size):
-        """
-        The main crossover function.
-        1. Creates new schedules using the picked operator.
-        2. Turns the schedules into the individuals.
-        3. Repairs.
-        """
-
         offspring = []
 
         while len(offspring) < target_size:
@@ -295,60 +297,49 @@ class GeneticAlgorithm:
             offspring.append(individual_1)
             offspring.append(individual_2)
 
-
-        print("Crossed!")
-
         return offspring[:target_size]
 
     def mutation_shift(self, individual):
-        """
-        1. Selects a maintenance to shift.
-        2. Moves it to a different free slot.
-        """
 
-        while True:
-            idx_1 = random.randint(0, self.n_periods - 1)
-            unit = individual.schedule[idx_1]
-            if unit != 0:
-                break
+        maintenance_periods = [i for i, x in enumerate(individual.schedule) if x != 0]
 
         free_periods = [i for i, x in enumerate(individual.schedule) if x == 0]
+
+        if not maintenance_periods or not free_periods:
+            return
+
+        idx_1 = random.choice(maintenance_periods)
         idx_2 = random.choice(free_periods)
+
+        unit = individual.schedule[idx_1]
 
         individual.schedule[idx_1] = 0
         individual.schedule[idx_2] = unit
 
     def mutation_swap(self, individual):
-        """
-        1. Selects two maintenances.
-        2. Swaps their places.
-        """
-        while True:
-            idx_1 = random.randint(0, self.n_periods - 1)
-            unit_1 = individual.schedule[idx_1]
-            if unit_1 != 0:
-                break
-        while True:
-            idx_2 = random.randint(0, self.n_periods - 1)
-            unit_2 = individual.schedule[idx_2]
-            if unit_2 != 0 and idx_1 != idx_2:
-                break
+        maintenance_periods = [i for i, x in enumerate(individual.schedule) if x != 0]
 
-        individual.schedule[idx_1] = unit_2
-        individual.schedule[idx_2] = unit_1
+        if len(maintenance_periods) < 2:
+            return
 
+        idx_1, idx_2 = random.sample(maintenance_periods, 2)
+
+        individual.schedule[idx_1], individual.schedule[idx_2] = (individual.schedule[idx_2], individual.schedule[idx_1])
 
     def mutation(self, offspring):
-
         n_to_mutate = int(self.mutation_rate * len(offspring))
+
+        if n_to_mutate == 0:
+            return
+
         individuals = random.sample(offspring, n_to_mutate)
+
         for individual in individuals:
             if self.mutation_op == "SHIFT":
                 self.mutation_shift(individual)
             else:
                 self.mutation_swap(individual)
-            self.adjust_fitness(individual)
-        print("Mutated!")
+            self.repair(individual)
 
     def apply_elitism(self, rate=0.1):
         n_elite = int(rate * len(self.population.individuals))
@@ -366,18 +357,31 @@ class GeneticAlgorithm:
         self.best_abs.append(self.best.fitness)
         self.best_per_gen.append(best_tmp.fitness)
 
+    def prepare_power_series(self):
+        power_actual = []
+
+        for idx in self.best.schedule:
+            power = 0
+
+            for unit in self.units:
+                if unit.idx != idx:
+                    power += unit.power
+
+            power_actual.append(power)
+
+        return power_actual
+
     def get_result(self):
         """
         Function preparing the result individual for display.
-        :return:
         """
-        return self.best, self.best_abs, self.best_per_gen, self.time, self.generations
+        return self.best, self.best_abs, self.best_per_gen, self.time, self.generations, self.prepare_power_series()
 
     def run(self):
         """
         Runs the main Genetic Algorithm loop.
         """
-        start = time()
+        start = perf_counter()
         for gen in range(self.generations):
             print("Gen: ", gen)
             elite = deepcopy(self.apply_elitism())
@@ -387,5 +391,19 @@ class GeneticAlgorithm:
             self.mutation(offspring)
 
             self.replace(elite, offspring)
-        end = time()
+        end = perf_counter()
         self.time = end - start
+
+    def run_cost_for_test(self):
+        """
+        DEPRECATE
+        Prepares formatted data for quicker analysis.
+        """
+        self.run()
+        f_cost = self.best.calculate_fitness_cost(self.operation_coef, self.cf, self.units, self.demands)
+        f_cost = (1- f_cost)/f_cost
+        self.best.fitness = 0
+        f_nett = self.best.calculate_fitness_reliability(self.units, self.demands)
+        return f_cost, self.best, self.time, self.prepare_power_series(), f_nett
+
+

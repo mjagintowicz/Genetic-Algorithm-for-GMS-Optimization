@@ -2,6 +2,8 @@ import numpy as np
 from backend.app_setup import AppSetup
 from frontend.dictionaries import pl, eng
 
+# INITIAL PARAMS
+
 app = AppSetup(20,
                25,
                np.concatenate((np.full(5, 100),

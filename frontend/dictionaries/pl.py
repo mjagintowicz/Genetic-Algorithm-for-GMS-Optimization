@@ -88,4 +88,8 @@ dict_PL = {
     "schedule": "Harmonogram Konserwacji",
     "objective": "Funkcja Celu",
     "results_missing": "Uruchom algorytm, aby uzyskać harmonogram.",
+
+    "power": "Moc",
+    "demand": "Zapotrzebowanie",
+    "power_gen": "Wyprodukowana moc",
 }
