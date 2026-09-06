@@ -1,5 +1,5 @@
 To run the app use:
 
 ```bash
-streamlit run app.py
+streamlit run ui.py
 ```
