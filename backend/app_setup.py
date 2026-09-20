@@ -8,11 +8,12 @@ from backend.ga import GeneticAlgorithm
 
 class AppSetup:
     def __init__(self, K, T, cf_1, cf_2, operation_coef, population_size, generations, criterion,
-                 selection_op, selection_rate, crossover_op, mutation_op, mutation_rate, lang_dict, elitism, cf):
+                 selection_op, selection_rate, crossover_op, mutation_op, mutation_rate, lang_dict, elitism, cf, cf_other=[], penalty_coef=1):
         self.K = K
         self.T = T
         self.cf_1 = cf_1
         self.cf_2 = cf_2
+        self.cf_other = cf_other
         self.cf = cf
         self.ops_coef = operation_coef
         self.units = []
@@ -26,12 +27,13 @@ class AppSetup:
         self.mutation_op = mutation_op
         self.mutation_rate = mutation_rate
         self.lang_dict = lang_dict
+        self.penalty_coef = penalty_coef
 
         self.elitism = elitism
 
         self.schedule = []
 
-        self.result = [] # self.best, self.best_abs, self.best_per_gen, self.time, self.generations, demand_actual
+        self.result = []
 
     def assign_units(self, power_vec):
         self.units = []
@@ -44,11 +46,18 @@ class AppSetup:
             self.demands.append(demand_vec[t])
 
     def maintenance_cost_chart(self):
-        chart = Chart(x=range(max(len(self.cf_1), len(self.cf_2))),
-                      y=[self.cf_1, self.cf_2],
-                      x_label=self.lang_dict["periods_since"],
-                      y_label=self.lang_dict["cost"],
-                      legend=[r'$cf_1$', r'$cf_2$'])
+        if self.cf is self.cf_1:
+            legend = [r'$cf_1$']
+        elif self.cf is self.cf_2:
+            legend = [r'$cf_2$']
+        else:
+            legend = ['Other']
+
+        x = range(1, len(self.cf) + 1)
+        y = [self.cf]
+
+        chart = Chart(x=x, y=y, x_label=self.lang_dict["periods_since"], y_label=self.lang_dict["cost"], legend=legend)
+
         return chart.function_plot()
 
     def operation_cost_chart(self):
@@ -74,7 +83,8 @@ class AppSetup:
                               crossover_op=self.crossover_op,
                               mutation_rate=self.mutation_rate,
                               mutation_op=self.mutation_op,
-                              elitism=self.elitism)
+                              elitism=self.elitism,
+                              penalty_coef=self.penalty_coef)
         print("Running...")
 
         ga.run()
@@ -121,7 +131,7 @@ class AppSetup:
 
     def prepare_result_values(self):
         ind = self.result[0]
-        cost = ind.calculate_fitness_cost(self.ops_coef, self.cf, self.units, self.demands)
+        cost = ind.calculate_fitness_cost(self.ops_coef, self.cf, self.units, self.demands, self.penalty_coef)
         cost =  (1 - cost) / cost
         reliability = ind.calculate_fitness_reliability(self.units, self.demands)
 

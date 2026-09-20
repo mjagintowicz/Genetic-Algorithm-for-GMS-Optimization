@@ -2,7 +2,7 @@ from backend.units import Schedule
 from collections import Counter
 import random
 from copy import deepcopy
-from time import time, perf_counter
+from time import perf_counter
 
 class Individual:
     def __init__(self, schedule_list):
@@ -12,7 +12,7 @@ class Individual:
     def __repr__(self):
         return f"IND: {self.schedule}\nFIT: {self.fitness}\n"
 
-    def calculate_fitness_cost(self, operation_coef, cf, units, demands):
+    def calculate_fitness_cost(self, operation_coef, cf, units, demands, penalty_coef):
         self.fitness = 0
         T = len(self.schedule)
         K = len(units)
@@ -33,7 +33,7 @@ class Individual:
                     periods_worked += 1
                     self.fitness += operation_coef * periods_worked
 
-        self.fitness += self.penalty(units, demands)
+        self.fitness +=  self.penalty(units, demands) * penalty_coef
         self.fitness = 1 / (self.fitness + 1)
         return self.fitness
 
@@ -73,7 +73,7 @@ class Individual:
 
 
 class Population:
-    def __init__(self, size, units, n_periods, operation_coef, cf, demands, criterion):
+    def __init__(self, size, units, n_periods, operation_coef, cf, demands, criterion, penalty_coef):
 
         self.individuals = []
 
@@ -81,7 +81,7 @@ class Population:
             schedule = Schedule(units, n_periods)
             individual = Individual(schedule.schedule)
             if criterion == "COST":
-                individual.calculate_fitness_cost(operation_coef, cf, units, demands)
+                individual.calculate_fitness_cost(operation_coef, cf, units, demands, penalty_coef)
             else:
                 individual.calculate_fitness_reliability(units, demands)
             self.individuals.append(individual)
@@ -97,9 +97,9 @@ class GeneticAlgorithm:
 
     def __init__(self, population_size, units, n_periods, operation_coef, cf, demands, criterion, generations,
                  selection_rate=0.6, selection_op="roulette", crossover_op="1_POINT", mutation_rate=0.05, mutation_op="SHIFT",
-                 elitism=False):
+                 elitism=False, penalty_coef=1):
 
-        self.population = Population(population_size, units, n_periods, operation_coef, cf, demands, criterion)
+        self.population = Population(population_size, units, n_periods, operation_coef, cf, demands, criterion, penalty_coef)
         self.next_population = []
 
         self.generations = generations
@@ -116,6 +116,7 @@ class GeneticAlgorithm:
         self.mutation_op = mutation_op
         self.selection_op = selection_op
         self.elitism = elitism
+        self.penalty_coef = penalty_coef
 
         self.best = max(self.population.individuals, key=lambda individual: individual.fitness)
         self.best_abs = [self.best.fitness] # best existing overall individual
@@ -174,7 +175,7 @@ class GeneticAlgorithm:
     def adjust_fitness(self, individual):
 
         if self.criterion == "COST":
-            individual.calculate_fitness_cost(self.operation_coef, self.cf, self.units, self.demands)
+            individual.calculate_fitness_cost(self.operation_coef, self.cf, self.units, self.demands, self.penalty_coef)
         else:
             individual.calculate_fitness_reliability(self.units, self.demands)
 
@@ -400,10 +401,20 @@ class GeneticAlgorithm:
         Prepares formatted data for quicker analysis.
         """
         self.run()
-        f_cost = self.best.calculate_fitness_cost(self.operation_coef, self.cf, self.units, self.demands)
+        f_cost = self.best.calculate_fitness_cost(self.operation_coef, self.cf, self.units, self.demands, self.penalty_coef)
         f_cost = (1- f_cost)/f_cost
         self.best.fitness = 0
         f_nett = self.best.calculate_fitness_reliability(self.units, self.demands)
-        return f_cost, self.best, self.time, self.prepare_power_series(), f_nett
+        best_abs_formatted = []
+        best_per_gen_formatted = []
+        if self.criterion == "COST":
+            for i in self.best_abs:
+                best_abs_formatted.append((1 - i)/i)
+            for i in self.best_per_gen:
+                best_per_gen_formatted.append((1 - i)/i)
+        else:
+            best_abs_formatted = self.best_abs
+            best_per_gen_formatted = self.best_per_gen
+        return f_cost, self.best, self.time, self.prepare_power_series(), f_nett, best_abs_formatted, best_per_gen_formatted
 
 

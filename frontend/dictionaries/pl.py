@@ -11,7 +11,7 @@ dict_PL = {
 
     "units_header": "Dane jednostek wytwórczych",
     "units_caption": "Liczba jednostek wytwórczych odpowiada rozmiarowi instancji problemu. Domyślny rozmiar wynosi 20.",
-    "units_warning": "Zmiana rozmiaru spowoduje zresetowanie wszystkich danych jednostek!",
+    "units_warning": "Zmiana rozmiaru spowoduje zresetowanie formularza!",
     "units_number": "Liczba jednostek",
     "units_power": "Moc wytwarzana w okresie",
 
@@ -19,8 +19,8 @@ dict_PL = {
     "period_number": "Liczba okresów",
 
     "costs_header": "Koszty",
-    "costs_maintenance": "Koszty remontów",
-    "maintenance_caption": "Koszty remontów są opisane za pomocą funkcji schodkowych. Możesz użyć domyślnych funkcji lub zdefiniować własne.",
+    "costs_maintenance": "Koszty konserwacji",
+    "maintenance_caption": "Koszty konserwacji są opisane za pomocą funkcji schodkowych. Możesz użyć domyślnych funkcji lub zdefiniować własne.",
     "costs_operation": "Koszty eksploatacji",
     "operation_caption": "Koszty eksploatacji są liniowe. Możesz dostosować współczynnik funkcji.",
     "operation_coef": "Współczynnik kosztu eksploatacji",
@@ -92,4 +92,17 @@ dict_PL = {
     "power": "Moc",
     "demand": "Zapotrzebowanie",
     "power_gen": "Wyprodukowana moc",
+
+    "penalty": "Współczynnik kary",
+    "wrong_data": "Nieprawidłowe dane.",
+    "correct_data": "Wczytano dane.",
+    "power_label": "Moc [MW]",
+    "demand_label": "Zapotrzebowanie [MW]",
+    "save": "Zapisz",
+    "load_file": "Wczytaj dane z pliku.",
+    "load": "Wczytaj",
+    "unit": "Jednostka",
+    "period_error": "Okresy muszą być w kolejności rosnącej.",
+    "add_period": "Dodaj okres",
+
 }

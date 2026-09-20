@@ -11,7 +11,7 @@ dict_ENG = {
 
     "units_header": "Generating units data",
     "units_caption": "The number of generating units corresponds with the problem instance size. The default size is 20.",
-    "units_warning": "Changing the size will reset all the units data!",
+    "units_warning": "Changing the size will reset the form!",
     "units_number": "Number of units",
 
     "demands_header": "Power demand data",
@@ -91,5 +91,17 @@ dict_ENG = {
     "power": "Power",
     "demand": "Demand",
     "power_gen": "Power generated",
+
+    "penalty": "Penalty coefficient",
+    "wrong_data": "Invalid data.",
+    "correct_data": "Data loaded.",
+    "power_label": "Power [MW]",
+    "demand_label": "Demand [MW]",
+    "save": "Save",
+    "load_file": "Load data from file.",
+    "load": "Load",
+    "unit": "Unit",
+    "period_error": "Periods must be in increasing order.",
+    "add_period": "Add period",
 
 }
