@@ -33,7 +33,7 @@ def load_units_from_file(uploaded_file):
 def load_units_section():
 
     uploaded_file = st.file_uploader(app.lang_dict["load_file"], type=["csv", "txt"], key="units_file",
-                                     accept_multiple_files=False)
+                                     accept_multiple_files=False, label_visibility="collapsed")
 
     if uploaded_file is not None:
 
