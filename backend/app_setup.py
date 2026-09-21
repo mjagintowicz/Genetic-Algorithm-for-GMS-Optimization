@@ -4,7 +4,7 @@
 import numpy as np
 from backend.charts import Chart
 from backend.units import Unit
-from backend.ga import GeneticAlgorithm
+from backend.ea import EvolutionaryAlgorithm
 
 class AppSetup:
     def __init__(self, K, T, cf_1, cf_2, operation_coef, population_size, generations, criterion,
@@ -70,25 +70,25 @@ class AppSetup:
         return chart.function_plot()
 
     def run(self):
-        ga = GeneticAlgorithm(population_size=self.population_size,
-                              units=self.units,
-                              n_periods=self.T,
-                              generations=self.generations,
-                              operation_coef=self.ops_coef,
-                              cf=self.cf,
-                              demands=self.demands,
-                              criterion=self.criterion,
-                              selection_rate=self.selection_rate,
-                              selection_op=self.selection_op,
-                              crossover_op=self.crossover_op,
-                              mutation_rate=self.mutation_rate,
-                              mutation_op=self.mutation_op,
-                              elitism=self.elitism,
-                              penalty_coef=self.penalty_coef)
+        ea = EvolutionaryAlgorithm(population_size=self.population_size,
+                                   units=self.units,
+                                   n_periods=self.T,
+                                   generations=self.generations,
+                                   operation_coef=self.ops_coef,
+                                   cf=self.cf,
+                                   demands=self.demands,
+                                   criterion=self.criterion,
+                                   selection_rate=self.selection_rate,
+                                   selection_op=self.selection_op,
+                                   crossover_op=self.crossover_op,
+                                   mutation_rate=self.mutation_rate,
+                                   mutation_op=self.mutation_op,
+                                   elitism=self.elitism,
+                                   penalty_coef=self.penalty_coef)
         print("Running...")
 
-        ga.run()
-        self.result = ga.get_result()
+        ea.run()
+        self.result = ea.get_result()
         print("Done!")
 
     def schedule_chart(self):

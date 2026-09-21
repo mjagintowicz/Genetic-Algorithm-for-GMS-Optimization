@@ -6,7 +6,7 @@ dict_ENG = {
     "costs_nav_title": "Costs",
     "algorithm_params_nav_title": "Algorithm Parameters",
 
-    "general_title": "Generator Maintenance Scheduling with Genetic Algorithm",
+    "general_title": "Generator Maintenance Scheduling with Evolutionary Algorithm",
     "general_caption": "Hello! (placeholder)",
 
     "units_header": "Generating units data",
@@ -59,14 +59,14 @@ dict_ENG = {
 
     "intro_gms": "Generator Maintenance Scheduling (GMS) aims to optimize a maintenance schedule for generating units over a specified planning horizon. The goal is to determine when individual units should be taken out of operation for maintenance while ensuring that the required power demand can be met. The resulting schedule should satisfy the imposed constraints while minimizing the total cost associated with the operation and maintenance of generating units or maximizing the generated power nett reserve.",
     "about_app": "About the application",
-    "about_text": "This application provides an interactive environment for solving GMS Problem using a Genetic Algorithm (GA). It allows users to define the input data, configure the optimization algorithm, generate a maintenance schedule, and analyze the obtained results.",
+    "about_text": "This application provides an interactive environment for solving GMS Problem using an Evolutionary Algorithm (EA). It allows users to define the input data, configure the optimization algorithm, generate a maintenance schedule, and analyze the obtained results.",
     "instruction": "How does it work?",
     "instruction_text": """
                         1. **Define input data**<br>
                          Enter the parameters of generating units, power demand, and cost functions. 
                          
                         2. **Configure the algorithm**<br>
-                         Set the GA parameters and select the desired genetic operators. 
+                         Set the EA parameters and select the desired genetic operators. 
                          
                         3. **Run optimization**<br>
                          Run the algorithm to search for a high-quality maintenance schedule. 

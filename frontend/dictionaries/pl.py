@@ -60,14 +60,14 @@ dict_PL = {
 
     "intro_gms": "Problem planowania konserwacji jednostek wytwórczych (ang. Generator Maintenance Scheduling, GMS) polega na optymalizacji harmonogramu prac konserwacyjnych i remontowych jednostek wytwórczych w określonym horyzoncie czasowym. Celem jest ustalenie terminów wyłączenia poszczególnych jednostek z eksploatacji na czas remontu, przy jednoczesnym zapewnieniu możliwości pokrycia wymaganego zapotrzebowania na moc. Otrzymany harmonogram powinien spełniać nałożone ograniczenia oraz minimalizować całkowity koszt związany z eksploatacją i remontami jednostek lub maksymalizować dostępną rezerwę mocy netto.",
     "about_app": "O aplikacji",
-    "about_text": "Aplikacja zapewnia interaktywne środowisko do rozwiązywania problemu GMS z wykorzystaniem algorytmu genetycznego (GA). Umożliwia zdefiniowanie danych wejściowych, konfigurację algorytmu optymalizacji, wygenerowanie harmonogramu remontów oraz analizę otrzymanych wyników.",
+    "about_text": "Aplikacja zapewnia interaktywne środowisko do rozwiązywania problemu GMS z wykorzystaniem algorytmu ewolucyjnego (EA). Umożliwia zdefiniowanie danych wejściowych, konfigurację algorytmu optymalizacji, wygenerowanie harmonogramu remontów oraz analizę otrzymanych wyników.",
     "instruction": "Jak to działa?",
     "instruction_text": """
                         1. **Zdefiniuj dane wejściowe**<br>
                            Wprowadź parametry jednostek wytwórczych, zapotrzebowanie na moc oraz funkcje kosztów.
                         
                         2. **Skonfiguruj algorytm**<br>
-                           Ustaw parametry algorytmu genetycznego oraz wybierz odpowiednie operatory genetyczne.
+                           Ustaw parametry algorytmu ewolucyjnego oraz wybierz odpowiednie operatory genetyczne.
                         
                         3. **Uruchom optymalizację**<br>
                            Uruchom algorytm w celu znalezienia rozwiązania o wysokiej jakości.

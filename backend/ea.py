@@ -93,7 +93,7 @@ class Population:
         return s
 
 
-class GeneticAlgorithm:
+class EvolutionaryAlgorithm:
 
     def __init__(self, population_size, units, n_periods, operation_coef, cf, demands, criterion, generations,
                  selection_rate=0.6, selection_op="roulette", crossover_op="1_POINT", mutation_rate=0.05, mutation_op="SHIFT",
@@ -380,7 +380,7 @@ class GeneticAlgorithm:
 
     def run(self):
         """
-        Runs the main Genetic Algorithm loop.
+        Runs the main Evolutionary Algorithm loop.
         """
         start = perf_counter()
         for gen in range(self.generations):
